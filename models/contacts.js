@@ -17,22 +17,16 @@ const getContactById = async (contactId) => {
 }
 
 const removeContact = async (contactId) => {
-    try {
-        const contactsData = await fs.readFile(contactsPath);
-        const contacts = JSON.parse(contactsData);
+    const contactsData = await fs.readFile(contactsPath);
+    const contacts = JSON.parse(contactsData);
+    const contactToBeRemovedIndex = contacts.findIndex(item => item.id === contactId);
+    if (contactToBeRemovedIndex !== -1) {
+        contacts.splice(contactToBeRemovedIndex, 1);
 
-        const contactToBeRemovedIndex = contacts.findIndex(item => item.id === contactId);
-
-        if (contactToBeRemovedIndex !== -1) {
-            contacts.splice(contactToBeRemovedIndex, 1);
-
-            await fs.writeFile(contactsPath, JSON.stringify(contacts));
-            console.log('Contact removed successfully.');
-        } else {
-            console.log('Contact not found.');
-        }
-    } catch (error) {
-        console.error('Error removing contact:', error);
+        await fs.writeFile(contactsPath, JSON.stringify(contacts));
+        console.log('Contact removed successfully.');
+    } else {
+        console.log('Contact not found.');
     }
 }
 
@@ -49,19 +43,17 @@ const addContact = async (body) => {
 }
 
 const updateContact = async (contactId, body) => {
-    try {
         const contactsData = await fs.readFile(contactsPath);
         const contacts = JSON.parse(contactsData);
-        const {name, email, phone} = body;
         const contactToBeUpdated = contacts.findIndex(item => item.id === contactId);
-        contacts[contactToBeUpdated].name = name;
-        contacts[contactToBeUpdated].email= email;
-        contacts[contactToBeUpdated].phone = phone;
-
+        if (contactToBeUpdated === -1) {
+            return null;
+        }
+        contacts[contactToBeUpdated] = {
+            ...contacts[contactToBeUpdated],
+            ...body
+        }
         await fs.writeFile(contactsPath, JSON.stringify(contacts));
-    } catch (error) {
-        console.error('Error updating contact:', error);
-    }
 }
 
 module.exports = {
