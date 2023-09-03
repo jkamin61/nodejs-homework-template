@@ -11,8 +11,13 @@ const authenticateUser = async (email, password) => {
     return User.findOne({email, password});
 }
 
+const setToken = async (email, token) => {
+    return User.updateOne({email}, {token});
+}
+
 module.exports = {
     registerUser,
     findUser,
-    authenticateUser
+    authenticateUser,
+    setToken
 };

@@ -9,7 +9,8 @@ const secret = process.env.SECRET
 const {
     registerUser,
     findUser,
-    authenticateUser
+    authenticateUser,
+    setToken
 } = require("../../models/userController");
 
 const userJoiSchema = Joi.object({
@@ -22,7 +23,8 @@ const userJoiSchema = Joi.object({
 
 const auth = (req, res, next) => {
     passport.authenticate('jwt', {session: false}, (err, user) => {
-        if (!user || err) {
+        const token = req.header('authorization').split(" ")[1];
+        if (!user || err || !token || user.token !== token) {
             return res.status(401).json({
                 status: 'error',
                 code: 401,
@@ -89,6 +91,7 @@ router.post('/login', async (req, res, next) => {
                 username: user.username,
             }
             const token = jwt.sign(payload, secret, {expiresIn: '1h'})
+            await setToken(user.email, token);
             res.json({
                 status: 'success',
                 code: 200,
@@ -103,12 +106,13 @@ router.post('/login', async (req, res, next) => {
 })
 
 router.get('/logout', auth, async (req, res, next) => {
-    const {username} = req.user
+    const {email} = req.user;
+    await setToken(email, null);
     res.json({
         status: 'success',
         code: 200,
         data: {
-            message: `Authorization was successful: ${username}`,
+            message: `Authorization was successful: ${email}`,
         },
     })
 })
