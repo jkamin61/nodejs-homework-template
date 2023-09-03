@@ -7,7 +7,7 @@ const {
     removeContact,
     updateContact,
     updateStatusContact,
-} = require("../../models/contacts");
+} = require("../../models/contactsController");
 const router = express.Router()
 
 const postContactSchema = Joi.object({
@@ -160,11 +160,19 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
                 });
             } else {
                 await updateStatusContact(contactId, body.favorite);
-                res.status(200).json({
-                    status: 'success',
-                    code: 200,
-                    message: 'Contact added to favorites'
-                })
+                if (body.favorite === true) {
+                    res.status(200).json({
+                        status: 'success',
+                        code: 200,
+                        message: 'Contact added to favorites'
+                    })
+                } else {
+                    res.status(200).json({
+                        status: 'success',
+                        code: 200,
+                        message: 'Contact removed from favorites'
+                    })
+                }
             }
         }
     } catch (error) {
