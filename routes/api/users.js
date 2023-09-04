@@ -118,12 +118,13 @@ router.get('/logout', auth, async (req, res, next) => {
 })
 
 router.get('/current', auth, async (req, res, next) => {
-    const {email} = req.user;
+    const {email, subscription} = req.user;
     res.json({
         status: 'success',
         code: 200,
         data: {
-            message: `Authorization was successful, user's data: ${email}`
+            email: email,
+            subscription: subscription
         },
     })
 })
