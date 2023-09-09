@@ -2,8 +2,7 @@ const express = require('express')
 const Joi = require('joi');
 const router = express.Router()
 const jwt = require('jsonwebtoken')
-const passport = require('passport')
-const User = require('../../schemas/userSchema');
+const User = require('../../schemas/user.schema');
 require('dotenv').config()
 const secret = process.env.SECRET
 const {
@@ -11,8 +10,8 @@ const {
     findUser,
     authenticateUser,
     setToken
-} = require("../../models/userController");
-
+} = require("../../controllers/user.controller");
+const  auth  = require("../../middlewares/auth")
 const userJoiSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string()
@@ -21,21 +20,7 @@ const userJoiSchema = Joi.object({
         .required(),
 });
 
-const auth = (req, res, next) => {
-    passport.authenticate('jwt', {session: false}, (err, user) => {
-        const token = req.header('authorization').split(" ")[1];
-        if (!user || err || !token || user.token !== token) {
-            return res.status(401).json({
-                status: 'error',
-                code: 401,
-                message: 'Unauthorized',
-                data: 'Unauthorized',
-            })
-        }
-        req.user = user
-        next()
-    })(req, res, next)
-}
+
 
 router.post('/signup', async (req, res, next) => {
     try {

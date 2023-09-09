@@ -7,7 +7,7 @@ const {
     removeContact,
     updateContact,
     updateStatusContact,
-} = require("../../models/contactsController");
+} = require("../../controllers/contacts.controller");
 const router = express.Router()
 
 const postContactSchema = Joi.object({
