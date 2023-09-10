@@ -11,6 +11,7 @@ const {
     authenticateUser,
     setToken,
     updateUsersAvatarURL,
+    createAndSaveAvatar,
 } = require("../../controllers/user.controller");
 const auth = require("../../middlewares/auth")
 const userJoiSchema = Joi.object({
@@ -117,12 +118,14 @@ router.get('/current', auth, async (req, res, next) => {
 router.patch('/avatars', auth, async (req, res, next) => {
     try {
         const {email} = req.user;
-        await updateUsersAvatarURL(email);
+        const {avatarFile} = req.file;
+        const avatarURL = await updateUsersAvatarURL(email);
+        await createAndSaveAvatar(email, avatarFile);
         res.json({
             status: 'OK',
             code: 200,
             data: {
-                avatarURL: req.user.avatarURL,
+                avatarURL,
             }
         })
     } catch (err) {
