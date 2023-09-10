@@ -19,12 +19,7 @@ const uploadFile = async (req, res, next) => {
     });
 };
 
-const getFileByItsName = async (fileName) => {
-
-}
-
 module.exports = {
     uploadFile,
-    getFileByItsName,
     AVATARS_DIR
 };

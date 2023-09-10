@@ -9,9 +9,10 @@ const {
     registerUser,
     findUser,
     authenticateUser,
-    setToken
+    setToken,
+    updateUsersAvatarURL,
 } = require("../../controllers/user.controller");
-const  auth  = require("../../middlewares/auth")
+const auth = require("../../middlewares/auth")
 const userJoiSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string()
@@ -19,7 +20,6 @@ const userJoiSchema = Joi.object({
         .min(4)
         .required(),
 });
-
 
 
 router.post('/signup', async (req, res, next) => {
@@ -112,6 +112,22 @@ router.get('/current', auth, async (req, res, next) => {
             subscription: subscription
         },
     })
+})
+
+router.patch('/avatars', auth, async (req, res, next) => {
+    try {
+        const {email} = req.user;
+        await updateUsersAvatarURL(email);
+        res.json({
+            status: 'OK',
+            code: 200,
+            data: {
+                avatarURL: req.user.avatarURL,
+            }
+        })
+    } catch (err) {
+        next(err);
+    }
 })
 
 module.exports = router;
