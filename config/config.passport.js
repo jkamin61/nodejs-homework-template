@@ -1,6 +1,6 @@
 const passport = require('passport')
 const passportJWT = require('passport-jwt')
-const User = require('../schemas/userSchema')
+const User = require('../schemas/user.schema')
 require('dotenv').config()
 const secret = process.env.SECRET
 
