@@ -122,26 +122,28 @@ router.get('/current', auth, async (req, res, next) => {
     })
 })
 
-router.patch('/avatars', auth, upload, async (req, res, next) => {
+router.patch('/avatars', auth, upload.single('avatar'), async (req, res, next) => {
     try {
         const {email} = req.user;
-        await uploadFile();
         const avatarURL = await updateUsersAvatarURL(email);
-        return res.json({
+        await uploadFile(req, res,next);
+        res.json({
             status: 'OK',
             code: 200,
             data: {
                 avatarURL,
-            }
+            },
+            message: "File uploaded successfully"
         })
     } catch (err) {
         next(err);
-        return res.json({
+        res.json({
             status: 'failure',
             code: 400,
             message: err.message
         })
     }
+
 });
 
 module.exports = router;

@@ -7,9 +7,9 @@ const upload = multer({
             callback(null, config.TMP_PATH);
         },
         filename: (_, file, callback) => {
-            callback(file.originalname);
+            callback(null, file.originalname);
         },
     })
 })
 
-module.exports = upload.single('file');
+module.exports = upload;
