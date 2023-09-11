@@ -11,9 +11,11 @@ const {
     authenticateUser,
     setToken,
     updateUsersAvatarURL,
-    createAndSaveAvatar,
 } = require("../../controllers/user.controller");
+const upload = require("../../middlewares/upload");
 const auth = require("../../middlewares/auth")
+const {uploadFile} = require("../../controllers/upload.controller");
+
 const userJoiSchema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string()
@@ -21,7 +23,6 @@ const userJoiSchema = Joi.object({
         .min(4)
         .required(),
 });
-
 
 router.post('/signup', async (req, res, next) => {
     try {
@@ -61,7 +62,7 @@ router.post('/login', async (req, res, next) => {
     try {
         const {error, value} = userJoiSchema.validate(req.body);
         if (error) {
-            res.status(400).json({
+            return res.status(400).json({
                 status: 'Bad Request',
                 code: 400,
                 message: "Validation error",
@@ -78,12 +79,18 @@ router.post('/login', async (req, res, next) => {
             }
             const token = jwt.sign(payload, secret, {expiresIn: '1h'})
             await setToken(user.email, token);
-            res.json({
+            return res.json({
                 status: 'success',
                 code: 200,
                 data: {
                     token,
                 },
+            })
+        } else {
+            return res.json({
+                status: 'failure',
+                code: 400,
+                message: error
             })
         }
     } catch (error) {
@@ -115,13 +122,12 @@ router.get('/current', auth, async (req, res, next) => {
     })
 })
 
-router.patch('/avatars', auth, async (req, res, next) => {
+router.patch('/avatars', auth, upload, async (req, res, next) => {
     try {
         const {email} = req.user;
-        const {avatarFile} = req.file;
+        await uploadFile();
         const avatarURL = await updateUsersAvatarURL(email);
-        await createAndSaveAvatar(email, avatarFile);
-        res.json({
+        return res.json({
             status: 'OK',
             code: 200,
             data: {
@@ -130,7 +136,12 @@ router.patch('/avatars', auth, async (req, res, next) => {
         })
     } catch (err) {
         next(err);
+        return res.json({
+            status: 'failure',
+            code: 400,
+            message: err.message
+        })
     }
-})
+});
 
 module.exports = router;

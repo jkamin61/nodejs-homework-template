@@ -1,7 +1,14 @@
-const path = require('node:path')
-const getUploadsPath = () => {
-    return path.join(process.cwd(),'public','avatars');}
+const path = require('node:path');
+
+const getTempPath = () => {
+    return path.join(process.cwd(), 'tmp');
+};
+
+const getAvatarUploadsPath = () => {
+    return path.join(process.cwd(), 'public', 'avatars');
+};
 
 module.exports = {
-    UPLOADS_PATH: getUploadsPath(),
-}
+    TMP_PATH: getTempPath(),
+    UPLOADS_PATH: getAvatarUploadsPath(),
+};
